@@ -62,7 +62,6 @@ export default {
   data() {
     return {
       geoRegions: null,
-      loaded: false,
       activeRegion: null,
       showPartnerList: false,
       showNoPartnersTip: false,
@@ -135,8 +134,6 @@ export default {
       this.totalImplementationsCounter += region.implementationCounter;
       this.totalRegionalPartnersCounter += region.regionalCounter;
     });
-
-    this.loaded = true;
   },
   methods: {
     onClosePartnerList() {
