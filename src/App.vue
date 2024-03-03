@@ -46,9 +46,9 @@ import OverallInfo from "@/components/OverallInfo/OverallInfo.vue";
 import RegionMap from "@/components/RegionMap/RegionMap.vue";
 
 const topoJsonURL =
-  "https://gist.githubusercontent.com/megFree/0c3bfaf9d34f8faca9be4d2b6be00aa2/raw/6d5706743886f88f36ed9ea91f6398611eeb8fcd/russiaSimpleTopo.json";
+  "https://gist.githubusercontent.com/megFree/8e2ce80c44eb649bbadced8766a7621f/raw/3f88507283c2f858c556840d660296060e65c8a5/gistfile1.txt";
 const companiesJsonURL =
-  "https://gist.githubusercontent.com/megFree/265c96083cf012718f8c746a8b3c718b/raw/d8e899d0b06e650d5c4cf57276414446ca58b725/demodata.json";
+  "https://gist.githubusercontent.com/megFree/d2e19e7870b808bcc51608ecab4c4284/raw/76a587379fb5dd8da71c290921d5343a83b05d8c/companiesData";
 
 export default {
   components: {
