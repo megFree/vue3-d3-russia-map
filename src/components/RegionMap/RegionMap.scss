@@ -1,0 +1,118 @@
+.region-map {
+  background: linear-gradient(
+      0deg,
+      rgba(32, 22, 0, 0) 48%,
+      rgba(32, 22, 0, 0.1) 50%,
+      rgba(32, 22, 0, 0) 50%
+    ),
+    linear-gradient(
+      90deg,
+      rgba(32, 22, 0, 0) 48%,
+      rgba(32, 22, 0, 0.1) 50%,
+      rgba(32, 22, 0, 0) 50%
+    );
+  background-size: 38px 38px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 570px;
+}
+@media screen and (max-width: #{$xl}) {
+  .region-map {
+    height: 400px;
+  }
+}
+@media screen and (max-width: #{$sm}) {
+  .region-map {
+    height: 380px;
+    position: relative;
+  }
+}
+
+.region-map__svg {
+  width: 100%;
+  height: 100%;
+}
+
+.region-map__region {
+  fill: #dbecff;
+  stroke: #fff;
+  stroke-linejoin: round;
+  transition: fill 0.1s ease-in-out;
+  cursor: pointer;
+}
+
+.region-map__region:hover,
+.region-map__region.active {
+  fill: #009eee;
+}
+
+.region-map__region.no-partners:hover,
+.region-map__region.active.no-partners {
+  fill: #fddfdd;
+}
+
+.region-map__region--not-stroke {
+  stroke: none;
+}
+
+.region-map__city--big-outer {
+  fill: #fff;
+  stroke: #004c93;
+}
+
+.region-map__city--big-inner {
+  fill: #004c93;
+}
+
+.region-map__city--small {
+  fill: #004c93;
+  stroke: #fff;
+  z-index: 100;
+}
+
+.region-map__city-counter {
+  text-anchor: middle;
+  fill: #fff;
+}
+
+.region-map__city {
+  cursor: pointer;
+}
+
+.region-map__region-tip {
+  position: absolute;
+}
+
+.region-map__zoom {
+  position: absolute;
+  left: 150px;
+}
+
+@media screen and (max-width: #{$lg}) {
+  .region-map__zoom {
+    left: 50px;
+  }
+}
+@media screen and (max-width: #{$sm}) {
+  .region-map__zoom {
+    left: 10px;
+    bottom: 10px;
+  }
+}
+
+.region-map__zoom-button {
+    position: absolute;   
+}
+
+@media screen and (max-width: #{$lg}) {
+  .zoom-buttons {
+    left: 50px;
+  }
+}
+@media screen and (max-width: #{$sm}) {
+  .zoom-buttons {
+    left: 10px;
+    bottom: 10px;
+  }
+}
