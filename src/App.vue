@@ -82,7 +82,7 @@
               class="partners-map__list-close"
               @click="onClosePartnerList"
           >
-            <img src="./assets/logo.png" alt="Крестик" />
+            <img src="./assets/images/close.svg" alt="Крестик" />
           </button>
         </div>
         <div class="partners-map__list-columns-titles">
@@ -103,23 +103,23 @@
               class="partners-map__list-item"
               v-for="partner in activeCity.partners"
               :key="partner.partner"
-              :href="partner.link"
+              href="#"
           >
             <div class="partners-map__list-status">
               <div class="partners-map__list-status-ico">
                 <img
                     v-if="partner.crucial"
-                    src="./assets/logo.png"
+                    src="./assets/images/key.svg"
                     alt="Иконка ключевого партнера"
                 />
                 <img
                     v-else-if="partner.certified"
-                    src="./assets/logo.png"
+                    src="./assets/images/document.png"
                     alt="Иконка сертифицированного партнера"
                 />
                 <img
                     v-else
-                    src="./assets/logo.png"
+                    src="./assets/images/home.svg"
                     alt="Иконка регионального партнера"
                 />
               </div>
@@ -161,7 +161,7 @@
                 class="partners-map__no-partners-tip-close"
             >
               <img
-                  src="./assets/logo.png"
+                  src="./assets/images/close.svg"
                   alt="Крестик"
               />
             </button>
@@ -176,7 +176,7 @@
       <div class="partners-map__info-item">
         <div class="partners-map__info-item-ico">
           <img
-              src="./assets/logo.png"
+              src="./assets/images/downtown.png"
               alt="Иконка локации"
           />
         </div>
@@ -191,7 +191,7 @@
       <div class="partners-map__info-item">
         <div class="partners-map__info-item-ico">
           <img
-              src="./assets/logo.png"
+              src="./assets/images/home.svg"
               alt="Иконка региональных партнеров"
           />
         </div>
@@ -210,7 +210,7 @@
       <div class="partners-map__info-item">
         <div class="partners-map__info-item-ico">
           <img
-              src="./assets/logo.png"
+              src="./assets/images/key.svg"
               alt="Иконка ключевых партнеров"
           />
         </div>
@@ -227,7 +227,7 @@
       <div class="partners-map__info-item">
         <div class="partners-map__info-item-ico">
           <img
-              src="./assets/logo.png"
+              src="./assets/images/document.png"
               alt="Иконка сертифицированных партнеров"
           />
         </div>
@@ -246,7 +246,7 @@
       <div class="partners-map__info-item">
         <div class="partners-map__info-item-ico">
           <img
-              src="./assets/logo.png"
+              src="./assets/images/connection.png"
               alt="Иконка количества внедрений"
           />
         </div>
@@ -278,6 +278,7 @@ import {
   zoomIdentity,
 } from "d3";
 import { feature } from "topojson-client";
+import 'normalize.css';
 
 const topoJsonURL =
     "https://gist.githubusercontent.com/megFree/0c3bfaf9d34f8faca9be4d2b6be00aa2/raw/6d5706743886f88f36ed9ea91f6398611eeb8fcd/russiaSimpleTopo.json";
@@ -559,13 +560,38 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
+@font-face {
+  font-family: 'Open Sans';
+  font-weight: 400;
+  src: url('@/assets/fonts/OpenSans-Regular.ttf');
+}
+
+$xl: 1440px;
+$lg: 1200px;
+$md: 990px;
+$sm: 768px;
+$xs: 576px;
+
 :root {
   --xl: 1440;
   --lg: 1200;
   --md: 990;
   --sm: 768;
   --xs: 576;
+}
+
+html {
+  font-family: 'Open Sans', 'Roboto', sans-serif;
+  font-size: 14px;
+}
+
+a:hover {
+  color: #009eee;
+}
+
+a {
+  font-weight: 600;
 }
 
 .partners-map__map {
@@ -587,12 +613,12 @@ export default {
   align-items: center;
   height: 570px;
 }
-@media screen and (max-width: var(--xl)) {
+@media screen and (max-width: #{$xl}) {
   .partners-map__map {
     height: 400px;
   }
 }
-@media screen and (max-width: var(--sm)) {
+@media screen and (max-width: #{$sm}) {
   .partners-map__map {
     height: 380px;
     position: relative;
@@ -613,7 +639,7 @@ export default {
   top: 0;
 }
 
-@media screen and (max-width: var(--lg)) {
+@media screen and (max-width: #{$lg}) {
   .partners-map__popup-fade {
     display: block;
   }
@@ -694,12 +720,12 @@ export default {
   background: #fff;
 }
 
-@media screen and (max-width: var(--lg)) {
+@media screen and (max-width: #{$lg}) {
   .partners-map__zoom {
     left: 50px;
   }
 }
-@media screen and (max-width: var(--sm)) {
+@media screen and (max-width: #{$sm}) {
   .partners-map__zoom {
     left: 10px;
     bottom: 10px;
@@ -743,12 +769,12 @@ export default {
   box-shadow: 2px 4px 100px 34px rgba(34, 60, 80, 0.2);
 }
 
-@media screen and (max-width: var(--xl)) {
+@media screen and (max-width: #{$xl}) {
   .partners-map__list {
     width: 585px;
   }
 }
-@media screen and (max-width: var(--lg)) {
+@media screen and (max-width: #{$lg}) {
   .partners-map__list {
     left: 5% !important;
     position: fixed;
@@ -768,7 +794,7 @@ export default {
   align-items: center;
 }
 
-@media screen and (max-width: var(--xs)) {
+@media screen and (max-width: #{$xs}) {
   .partners-map__list-head {
     border-bottom: 1px solid #ebf8fe;
   }
@@ -780,7 +806,17 @@ export default {
 
 .partners-map__list-close {
   cursor: pointer;
-  min-width: 25px;
+  width: 16px;
+  height: 16px;
+  outline: none;
+  border: none;
+  background: none;
+  padding: 0;
+}
+
+.partners-map__list-close img {
+  width: 100%;
+  height: 100%;
 }
 
 .partners-map__list-columns-titles {
@@ -791,7 +827,7 @@ export default {
   color: #929aa3;
 }
 
-@media screen and (max-width: var(--xs)) {
+@media screen and (max-width: #{$xs}) {
   .partners-map__list-columns-titles {
     display: none;
   }
@@ -819,7 +855,7 @@ export default {
   align-items: center;
 }
 
-@media screen and (max-width: var(--xs)) {
+@media screen and (max-width: #{$xs}) {
   .partners-map__list-item {
     padding-top: 5px;
     padding-bottom: 5px;
@@ -841,15 +877,16 @@ export default {
   display: flex;
   flex-basis: 200px;
   flex-shrink: 0;
+  align-items: center;
 }
 
-@media screen and (max-width: var(--xs)) {
+@media screen and (max-width: #{$xs}) {
   .partners-map__list-status {
     flex-basis: initial;
   }
 }
 
-@media screen and (max-width: var(--xs)) {
+@media screen and (max-width: #{$xs}) {
   .partners-map__list-status-text {
     color: #929aa3;
   }
@@ -862,7 +899,7 @@ export default {
   text-overflow: ellipsis;
 }
 
-@media screen and (max-width: var(--xs)) {
+@media screen and (max-width: #{$xs}) {
   .partners-map__list-organization {
     white-space: pre-wrap;
     text-overflow: initial;
@@ -870,7 +907,7 @@ export default {
   }
 }
 
-@media screen and (max-width: var(--xs)) {
+@media screen and (max-width: #{$xs}) {
   .partners-map__list-amount {
     display: none;
   }
@@ -879,9 +916,16 @@ export default {
 .partners-map__list-status-ico {
   margin-right: 5px;
   flex-basis: 20px;
+  display: flex;
+  align-items: center;
 }
 
-@media screen and (max-width: var(--xs)) {
+.partners-map__list-status-ico img {
+  width: 18px;
+  height: 18px;
+}
+
+@media screen and (max-width: #{$xs}) {
   .partners-map__list-status-ico {
     display: none;
   }
@@ -892,8 +936,18 @@ export default {
 }
 
 .partners-map__no-partners-tip-close {
-  min-width: 20px;
+  width: 16px;
+  height: 16px;
   cursor: pointer;
+  background: none;
+  outline: none;
+  border: none;
+  padding: 0;
+}
+
+.partners-map__no-partners-tip-close img {
+  width: 100%;
+  height: 100%;
 }
 
 .partners-map__no-partners-tip-container {
@@ -903,7 +957,7 @@ export default {
   box-shadow: 2px 4px 100px 34px rgba(34, 60, 80, 0.2);
 }
 
-@media screen and (max-width: var(--lg)) {
+@media screen and (max-width: #{$lg}) {
   .partners-map__no-partners-tip-container {
     width: 80%;
     left: 10%;
@@ -934,7 +988,7 @@ export default {
   justify-content: space-evenly;
 }
 
-@media screen and (max-width: var(--md)) {
+@media screen and (max-width: #{$md}) {
   .partners-map__info {
     flex-wrap: wrap;
     justify-content: start;
@@ -942,14 +996,14 @@ export default {
     margin-top: 20px;
   }
 }
-@media screen and (max-width: var(--xs)) {
+@media screen and (max-width: #{$xs}) {
   .partners-map__info {
     flex-direction: column;
     margin-top: 0;
   }
 }
 
-@media screen and (max-width: var(--xs)) {
+@media screen and (max-width: #{$xs}) {
   .partners-map__info-item-content {
     padding-top: 8px;
   }
@@ -964,13 +1018,13 @@ export default {
   flex-shrink: 1;
 }
 
-@media screen and (max-width: var(--md)) {
+@media screen and (max-width: #{$md}) {
   .partners-map__info-item {
     width: 50%;
     flex-direction: row;
   }
 }
-@media screen and (max-width: var(--xs)) {
+@media screen and (max-width: #{$xs}) {
   .partners-map__info-item {
     min-width: 100%;
     align-items: start;
@@ -983,7 +1037,7 @@ export default {
   color: #929aa3;
 }
 
-@media screen and (max-width: var(--md)) {
+@media screen and (max-width: #{$md}) {
   .partners-map__info-item-title {
     text-align: left;
   }
@@ -991,9 +1045,19 @@ export default {
 
 .partners-map__info-item-ico {
   margin-bottom: 20px;
+  max-width: 48px;
+  max-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  img {
+    width: 100%;
+    height: 100%;
+  }
 }
 
-@media screen and (max-width: var(--md)) {
+@media screen and (max-width: #{$md}) {
   .partners-map__info-item-ico {
     margin-bottom: 0;
     margin-right: 15px;
@@ -1005,7 +1069,7 @@ export default {
   text-align: center;
 }
 
-@media screen and (max-width: var(--md)) {
+@media screen and (max-width: #{$md}) {
   .partners-map__info-item-value {
     text-align: left;
   }
