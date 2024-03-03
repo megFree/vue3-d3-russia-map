@@ -16,14 +16,12 @@
   justify-content: center;
   align-items: center;
   height: 570px;
-}
-@media screen and (max-width: #{$xl}) {
-  .region-map {
+
+  @media screen and (max-width: #{$xl}) {
     height: 400px;
   }
-}
-@media screen and (max-width: #{$sm}) {
-  .region-map {
+
+  @media screen and (max-width: #{$sm}) {
     height: 380px;
     position: relative;
   }
@@ -87,31 +85,25 @@
 .region-map__zoom {
   position: absolute;
   left: 150px;
-}
 
-@media screen and (max-width: #{$lg}) {
-  .region-map__zoom {
+  @media screen and (max-width: #{$lg}) {
     left: 50px;
-  }
-}
-@media screen and (max-width: #{$sm}) {
-  .region-map__zoom {
+  }  
+
+  @media screen and (max-width: #{$sm}) {
     left: 10px;
     bottom: 10px;
   }
 }
 
 .region-map__zoom-button {
-    position: absolute;   
-}
-
-@media screen and (max-width: #{$lg}) {
-  .zoom-buttons {
+  position: absolute;   
+  
+  @media screen and (max-width: #{$lg}) {
     left: 50px;
   }
-}
-@media screen and (max-width: #{$sm}) {
-  .zoom-buttons {
+
+  @media screen and (max-width: #{$sm}) {
     left: 10px;
     bottom: 10px;
   }
