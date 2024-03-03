@@ -3,7 +3,7 @@
     <div class="detail-tip__container">
       <div class="detail-tip__head">
         <div class="detail-tip__region">
-          ХУИТА
+          {{ title }}
         </div>
         <button
             @click="close"
@@ -26,6 +26,12 @@
 export default {
   name: 'DetailTip',
   emits: ['close'],
+  props: {
+    title: {
+      type: String,
+      required: true,
+    }
+  },
   methods: {
     close() {
       this.$emit('close');
