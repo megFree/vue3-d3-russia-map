@@ -46,31 +46,20 @@
           </template>
         </g>
       </svg>
-      <div
-          :style="regionTipStyles"
-          v-if="showRegionTip"
-          class="partners-map__region-tip"
+
+      <RegionHoverTip
+        v-if="showRegionTip"
+        class="partners-map__region-tip"
+        :style="regionTipStyles"
       >
-        {{hoveredRegion.properties.NAME}}
-      </div>
-      <div class="partners-map__zoom">
-        <button
-            @click="onZoomButton($event, 1.5)"
-            class="partners-map__zoom-btn partners-map__zoom-closer"
-        >
-          +
-        </button>
-        <button
-            @click="onZoomButton($event, .5)"
-            class="partners-map__zoom-btn partners-map__zoom-away"
-        >
-          —
-        </button>
-      </div>
-      <div
-          v-if="showNoPartnersTip || showPartnerList"
-          class="partners-map__popup-fade"
-      ></div>
+        {{ hoveredRegion.properties.NAME }}
+      </RegionHoverTip>
+
+      <ZoomButtons 
+        @zoom-in="onZoomButton($event, 1.5)"
+        @zoom-out="onZoomButton($event, .5)"
+      />
+      
       <div
           v-if="showPartnerList"
           :style="partnerListStyles"
@@ -146,31 +135,17 @@
           </a>
         </div>
       </div>
-      <div
-          v-if="showNoPartnersTip"
-          class="partners-map__no-partners-tip"
-          :style="noPartnersTipStyles"
+      <DetailTip 
+        v-if="showNoPartnersTip"
+        class="partners-map__detail-tip"
+        :style="noPartnersTipStyles"
+        :title="activeRegion.properties.NAME"
+        @close="onCloseNoPartnerTip"
       >
-        <div class="partners-map__no-partners-tip-container">
-          <div class="partners-map__no-partners-tip-head">
-            <div class="partners-map__no-partners-tip-region">
-              {{ activeRegion.properties.NAME }}
-            </div>
-            <button
-                @click="onCloseNoPartnerTip"
-                class="partners-map__no-partners-tip-close"
-            >
-              <img
-                  src="./assets/images/close.svg"
-                  alt="Крестик"
-              />
-            </button>
-          </div>
-          <div class="partners-map__no-partners-tip-message">
-            В данном регионе партнёров не обнаружено!
-          </div>
+        <div class="partners-map__not-found-warning">
+          В данном регионе партнёров не обнаружено!
         </div>
-      </div>
+      </DetailTip>
     </div>
     <div class="partners-map__info container">
       <div class="partners-map__info-item">
@@ -279,6 +254,9 @@ import {
 } from "d3";
 import { feature } from "topojson-client";
 import 'normalize.css';
+import RegionHoverTip from '@/components/RegionHoverTip/RegionHoverTip.vue';
+import ZoomButtons from '@/components/ZoomButtons/ZoomButtons.vue';
+import DetailTip from '@/components/DetailTip/DetailTip.vue';
 
 const topoJsonURL =
     "https://gist.githubusercontent.com/megFree/0c3bfaf9d34f8faca9be4d2b6be00aa2/raw/6d5706743886f88f36ed9ea91f6398611eeb8fcd/russiaSimpleTopo.json";
@@ -286,6 +264,11 @@ const partnersJsonURL =
     "https://gist.githubusercontent.com/megFree/265c96083cf012718f8c746a8b3c718b/raw/d8e899d0b06e650d5c4cf57276414446ca58b725/demodata.json";
 
 export default {
+  components: {
+    RegionHoverTip,
+    ZoomButtons,
+    DetailTip
+  },
   data() {
     return {
       geoRegions: null,
@@ -353,86 +336,80 @@ export default {
       },
     };
   },
-  beforeCreate() {
-    json(topoJsonURL).then((topology, error) => {
-      if (error) throw error;
+  async mounted() {
+    this.setProjection();
+    const topology = await json(topoJsonURL);
+    const regionData = feature(topology, "russiaGeo").features;
 
-      const regionData = feature(topology, "russiaGeo").features;
+    // Костыль для чукотки
+    // 21 - номер чукотки в geoJson-файле
+    // Иначе она рассекается по нулевому меридиану, картографам привет)
+    regionData[21].properties.notStroke = true;
 
-      // Костыль для чукотки
-      // 21 - номер чукотки в geoJson-файле
-      // Иначе она рассекается по нулевому меридиану, картографам привет)
-      regionData[21].properties.notStroke = true;
+    const partnerRegionalData = await json(partnersJsonURL);
+    regionData.forEach((region) => {
+      region.crucialCounter = 0;
+      region.certifiedCounter = 0;
+      region.regionalCounter = 0;
+      region.implementationCounter = 0;
 
-      json(partnersJsonURL).then((partnerRegionalData, error) => {
-        if (error) throw error;
+      partnerRegionalData.forEach((regionalData) => {
+        if (region.properties.ISO === regionalData.iso) {
+          region.partnerData = regionalData;
 
-        regionData.forEach((region) => {
-          region.crucialCounter = 0;
-          region.certifiedCounter = 0;
-          region.regionalCounter = 0;
-          region.implementationCounter = 0;
-
-          partnerRegionalData.forEach((regionalData) => {
-            if (region.properties.ISO === regionalData.iso) {
-              region.partnerData = regionalData;
-
-              regionalData.cities.forEach((city) => {
-                city.partners.forEach((partner) => {
-                  if (partner.crucial) {
-                    region.crucialCounter++;
-                  }
-                  if (partner.certified) {
-                    region.certifiedCounter++;
-                  }
-                  if (partner.regional) {
-                    region.regionalCounter++;
-                  }
-                  region.implementationCounter += partner.count;
-                });
-              });
-            }
-          });
-        });
-
-        regionData.forEach((region) => {
-          if (region.partnerData) {
-            return (region.hasPartners = true);
-          } else {
-            return (region.hasPartners = false);
-          }
-        });
-
-        this.geoRegions = regionData;
-
-        const partnerCities = [];
-        this.geoRegions.forEach((region) => {
-          if (region.hasPartners) {
-            region.partnerData.cities.forEach((city) => {
-              city.translate = `translate(${this.projection([
-                city.coord[1],
-                city.coord[0],
-              ])})`;
-              city.regionISO = region.properties.ISO;
-              partnerCities.push(city);
+          regionalData.cities.forEach((city) => {
+            city.partners.forEach((partner) => {
+              if (partner.crucial) {
+                region.crucialCounter++;
+              }
+              if (partner.certified) {
+                region.certifiedCounter++;
+              }
+              if (partner.regional) {
+                region.regionalCounter++;
+              }
+              region.implementationCounter += partner.count;
             });
-          }
-        });
-        this.partnerCities = partnerCities;
-
-        this.geoRegions.forEach((region) => {
-          this.totalCertifiedPartnersCounter += region.certifiedCounter;
-          this.totalCrucialPartnersCounter += region.crucialCounter;
-          this.totalImplementationsCounter += region.implementationCounter;
-          this.totalRegionalPartnersCounter += region.regionalCounter;
-        });
-
-        this.loaded = true;
+          });
+        }
       });
     });
-  },
-  mounted() {
-    this.setProjection();
+
+        
+    regionData.forEach((region) => {
+      if (region.partnerData) {
+        return (region.hasPartners = true);
+      } else {
+        return (region.hasPartners = false);
+      }
+    });
+
+    this.geoRegions = regionData;
+
+    const partnerCities = [];
+    this.geoRegions.forEach((region) => {
+      if (region.hasPartners) {
+        region.partnerData.cities.forEach((city) => {
+          city.translate = `translate(${this.projection([
+            city.coord[1],
+            city.coord[0],
+          ])})`;
+          city.regionISO = region.properties.ISO;
+          partnerCities.push(city);
+        });
+      }
+    });
+    this.partnerCities = partnerCities;
+
+    this.geoRegions.forEach((region) => {
+      this.totalCertifiedPartnersCounter += region.certifiedCounter;
+      this.totalCrucialPartnersCounter += region.crucialCounter;
+      this.totalImplementationsCounter += region.implementationCounter;
+      this.totalRegionalPartnersCounter += region.regionalCounter;
+    });
+
+    this.loaded = true;
+
     this.setPath();
     this.initZoom();
   },
@@ -561,39 +538,6 @@ export default {
 </script>
 
 <style lang="scss">
-@font-face {
-  font-family: 'Open Sans';
-  font-weight: 400;
-  src: url('@/assets/fonts/OpenSans-Regular.ttf');
-}
-
-$xl: 1440px;
-$lg: 1200px;
-$md: 990px;
-$sm: 768px;
-$xs: 576px;
-
-:root {
-  --xl: 1440;
-  --lg: 1200;
-  --md: 990;
-  --sm: 768;
-  --xs: 576;
-}
-
-html {
-  font-family: 'Open Sans', 'Roboto', sans-serif;
-  font-size: 14px;
-}
-
-a:hover {
-  color: #009eee;
-}
-
-a {
-  font-weight: 600;
-}
-
 .partners-map__map {
   background: linear-gradient(
       0deg,
@@ -622,26 +566,6 @@ a {
   .partners-map__map {
     height: 380px;
     position: relative;
-  }
-}
-
-.partners-map__popup-fade {
-  display: none;
-  position: fixed;
-  height: 100%;
-  width: 100%;
-  background: black;
-  opacity: 0.5;
-  z-index: 1;
-  right: 0;
-  left: 0;
-  bottom: 0;
-  top: 0;
-}
-
-@media screen and (max-width: #{$lg}) {
-  .partners-map__popup-fade {
-    display: block;
   }
 }
 
@@ -698,26 +622,11 @@ a {
 
 .partners-map__region-tip {
   position: absolute;
-  background: #fff;
-  border-radius: 2px;
-  text-align: center;
-  font-size: 14px;
-  padding: 12px;
-  box-shadow: 0 1px 4px rgba(0, 25, 48, 0.25);
-  color: #677687;
-  user-select: none;
 }
 
 .partners-map__zoom {
   position: absolute;
-  border: 1px solid#dddddd;
-  border-radius: 2px;
-  display: flex;
-  flex-direction: column;
-  width: 40px;
-  height: 80px;
   left: 150px;
-  background: #fff;
 }
 
 @media screen and (max-width: #{$lg}) {
@@ -730,32 +639,6 @@ a {
     left: 10px;
     bottom: 10px;
   }
-}
-
-.partners-map__zoom-btn {
-  flex-grow: 1;
-  line-height: 38px;
-  text-align: center;
-  color: #b8c1cc;
-  border: none;
-  outline: none;
-  cursor: pointer;
-  transition: background-color color 0.1s ease-in-out;
-}
-
-.partners-map__zoom-btn:hover {
-  background: #b8c1cc;
-  color: #fff;
-}
-
-.partners-map__zoom-away {
-  font-size: 14px;
-  font-weight: bold;
-  border-top: 1px solid#dddddd;
-}
-
-.partners-map__zoom-closer {
-  font-size: 25px;
 }
 
 .partners-map__list {
@@ -774,6 +657,7 @@ a {
     width: 585px;
   }
 }
+
 @media screen and (max-width: #{$lg}) {
   .partners-map__list {
     left: 5% !important;
@@ -931,57 +815,9 @@ a {
   }
 }
 
-.partners-map__no-partners-tip {
+.partners-map__detail-tip {
   position: absolute;
 }
-
-.partners-map__no-partners-tip-close {
-  width: 16px;
-  height: 16px;
-  cursor: pointer;
-  background: none;
-  outline: none;
-  border: none;
-  padding: 0;
-}
-
-.partners-map__no-partners-tip-close img {
-  width: 100%;
-  height: 100%;
-}
-
-.partners-map__no-partners-tip-container {
-  border-radius: 2px;
-  box-sizing: border-box;
-  background: #fff;
-  box-shadow: 2px 4px 100px 34px rgba(34, 60, 80, 0.2);
-}
-
-@media screen and (max-width: #{$lg}) {
-  .partners-map__no-partners-tip-container {
-    width: 80%;
-    left: 10%;
-    position: fixed;
-    top: 40%;
-    z-index: 2;
-  }
-}
-
-.partners-map__no-partners-tip-head {
-  border-bottom: 1px solid #dadada;
-  display: flex;
-  padding: 9px 12px;
-  justify-content: space-between;
-  font-size: 16px;
-  font-weight: bold;
-  align-items: center;
-}
-
-.partners-map__no-partners-tip-message {
-  padding: 12px;
-  color: #f2291f;
-}
-
 .partners-map__info {
   display: flex;
   margin-top: 40px;
@@ -1033,7 +869,7 @@ a {
 
 .partners-map__info-item-title {
   text-align: center;
-  font-size: 12px;
+  font-size: .9rem;
   color: #929aa3;
 }
 
@@ -1075,4 +911,8 @@ a {
   }
 }
 
+.partners-map__not-found-warning {
+  padding: 12px;
+  color: #f2291f;
+}
 </style>

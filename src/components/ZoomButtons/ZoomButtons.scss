@@ -1,0 +1,53 @@
+.zoom-buttons__region-tip {
+  position: absolute;
+}
+
+.zoom-buttons {
+  position: absolute;
+  border: 1px solid#dddddd;
+  border-radius: 2px;
+  display: flex;
+  flex-direction: column;
+  width: 40px;
+  height: 80px;
+  left: 150px;
+  background: #fff;
+}
+
+@media screen and (max-width: #{$lg}) {
+  .zoom-buttons {
+    left: 50px;
+  }
+}
+@media screen and (max-width: #{$sm}) {
+  .zoom-buttons {
+    left: 10px;
+    bottom: 10px;
+  }
+}
+
+.zoom-buttons__btn {
+  flex-grow: 1;
+  line-height: 38px;
+  text-align: center;
+  color: #b8c1cc;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  transition: background-color color 0.1s ease-in-out;
+}
+
+.zoom-buttons__btn:hover {
+  background: #b8c1cc;
+  color: #fff;
+}
+
+.zoom-buttons__btn--away {
+  font-size: 14px;
+  font-weight: bold;
+  border-top: 1px solid#dddddd;
+}
+
+.zoom-buttons__btn--closer {
+  font-size: 25px;
+}
