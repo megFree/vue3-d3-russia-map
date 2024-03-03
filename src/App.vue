@@ -60,81 +60,19 @@
         @zoom-out="onZoomButton($event, .5)"
       />
       
-      <div
-          v-if="showPartnerList"
-          :style="partnerListStyles"
-          class="partners-map__list js-partner-list"
+      <DetailTip 
+        v-if="showPartnerList"
+        class="partners-map__detail-tip"
+        :style="partnerListStyles"
+        :title="activeCity.city"
+        @close="onClosePartnerList"
       >
-        <div class="partners-map__list-head">
-          <div class="partners-map__list-city">{{ activeCity.city }}</div>
-          <button
-              class="partners-map__list-close"
-              @click="onClosePartnerList"
-          >
-            <img src="./assets/images/close.svg" alt="Крестик" />
-          </button>
-        </div>
-        <div class="partners-map__list-columns-titles">
-          <div
-              class="partners-map__list-title partners-map__list-title--fixed-width"
-          >
-            Статус
-          </div>
-          <div
-              class="partners-map__list-title partners-map__list-title-org--grow"
-          >
-            Организация
-          </div>
-          <div class="partners-map__list-title">Кол-во внедрений</div>
-        </div>
-        <div class="partners-map__list-items-container">
-          <a
-              class="partners-map__list-item"
-              v-for="partner in activeCity.partners"
-              :key="partner.partner"
-              href="#"
-          >
-            <div class="partners-map__list-status">
-              <div class="partners-map__list-status-ico">
-                <img
-                    v-if="partner.crucial"
-                    src="./assets/images/key.svg"
-                    alt="Иконка ключевого партнера"
-                />
-                <img
-                    v-else-if="partner.certified"
-                    src="./assets/images/document.png"
-                    alt="Иконка сертифицированного партнера"
-                />
-                <img
-                    v-else
-                    src="./assets/images/home.svg"
-                    alt="Иконка регионального партнера"
-                />
-              </div>
-              <div
-                  v-if="partner.crucial"
-                  class="partners-map__list-status-text"
-              >
-                Ключевой
-              </div>
-              <div
-                  v-else-if="partner.certified"
-                  class="partners-map__list-status-text"
-              >
-                Сертифицированный
-              </div>
-              <div v-else class="partners-map__list-status-text">
-                Региональный
-              </div>
-            </div>
-            <div class="partners-map__list-organization">
-              {{ partner.partner }}
-            </div>
-            <div class="partners-map__list-amount">{{ partner.count }}</div>
-          </a>
-        </div>
-      </div>
+        <OrganizationList 
+          class="partners-map__org-list"
+          :items="activeCity.partners"
+        />
+      </DetailTip>
+
       <DetailTip 
         v-if="showNoPartnersTip"
         class="partners-map__detail-tip"
@@ -257,6 +195,7 @@ import 'normalize.css';
 import RegionHoverTip from '@/components/RegionHoverTip/RegionHoverTip.vue';
 import ZoomButtons from '@/components/ZoomButtons/ZoomButtons.vue';
 import DetailTip from '@/components/DetailTip/DetailTip.vue';
+import OrganizationList from '@/components/OrganizationList/OrganizationList.vue';
 
 const topoJsonURL =
     "https://gist.githubusercontent.com/megFree/0c3bfaf9d34f8faca9be4d2b6be00aa2/raw/6d5706743886f88f36ed9ea91f6398611eeb8fcd/russiaSimpleTopo.json";
@@ -267,7 +206,8 @@ export default {
   components: {
     RegionHoverTip,
     ZoomButtons,
-    DetailTip
+    DetailTip,
+    OrganizationList,
   },
   data() {
     return {
@@ -330,7 +270,7 @@ export default {
           cityBigInnerCircle: selectAll(".js-city-big-inner-mark"),
           citySmallCircle: selectAll(".js-city-small-mark"),
           cityCounter: selectAll(".js-partner-counter"),
-          partnerList: document.querySelector(".js-partner-list"),
+          // partnerList: document.querySelector(".js-partner-list"),
           map: document.querySelector(".js-partners-map"),
         };
       },
@@ -641,183 +581,12 @@ export default {
   }
 }
 
-.partners-map__list {
-  position: absolute;
-  width: 625px;
-  display: block;
-  flex-direction: column;
-  background: #fff;
-  border-radius: 4px;
-  box-sizing: border-box;
-  box-shadow: 2px 4px 100px 34px rgba(34, 60, 80, 0.2);
-}
 
-@media screen and (max-width: #{$xl}) {
-  .partners-map__list {
-    width: 585px;
-  }
-}
-
-@media screen and (max-width: #{$lg}) {
-  .partners-map__list {
-    left: 5% !important;
-    position: fixed;
-    top: 30% !important;
-    z-index: 2;
-    width: 90%;
-    min-width: inherit;
-  }
-}
-
-.partners-map__list-head {
-  display: flex;
-  flex-grow: 1;
-  font-weight: bold;
-  line-height: 40px;
-  padding: 0 12px;
-  align-items: center;
-}
-
-@media screen and (max-width: #{$xs}) {
-  .partners-map__list-head {
-    border-bottom: 1px solid #ebf8fe;
-  }
-}
-
-.partners-map__list-city {
-  flex-grow: 1;
-}
-
-.partners-map__list-close {
-  cursor: pointer;
-  width: 16px;
-  height: 16px;
-  outline: none;
-  border: none;
-  background: none;
-  padding: 0;
-}
-
-.partners-map__list-close img {
-  width: 100%;
-  height: 100%;
-}
-
-.partners-map__list-columns-titles {
-  background: #f9f9f9;
-  display: flex;
-  line-height: 35px;
-  padding: 0 12px;
-  color: #929aa3;
-}
-
-@media screen and (max-width: #{$xs}) {
-  .partners-map__list-columns-titles {
-    display: none;
-  }
-}
-
-.partners-map__list-title--fixed-width {
-  flex-basis: 195px;
-}
-
-.partners-map__list-title-org--grow {
-  flex-grow: 1;
-}
-
-.partners-map__list-items-container {
-  max-height: 250px;
-  overflow-y: scroll;
-}
-
-.partners-map__list-item {
-  display: flex;
-  padding: 0 12px;
-  line-height: 50px;
-  color: inherit;
-  text-decoration: none;
-  align-items: center;
-}
-
-@media screen and (max-width: #{$xs}) {
-  .partners-map__list-item {
-    padding-top: 5px;
-    padding-bottom: 5px;
-    flex-direction: column;
-    align-items: start;
-    line-height: initial;
-  }
-}
-
-.partners-map__list-item:not(:last-child) {
-  border-bottom: 1px solid #ebf8fe;
-}
-
-.partners-map__list-item:hover {
-  background: #f9f9f9;
-}
-
-.partners-map__list-status {
-  display: flex;
-  flex-basis: 200px;
-  flex-shrink: 0;
-  align-items: center;
-}
-
-@media screen and (max-width: #{$xs}) {
-  .partners-map__list-status {
-    flex-basis: initial;
-  }
-}
-
-@media screen and (max-width: #{$xs}) {
-  .partners-map__list-status-text {
-    color: #929aa3;
-  }
-}
-
-.partners-map__list-organization {
-  flex-grow: 1;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-@media screen and (max-width: #{$xs}) {
-  .partners-map__list-organization {
-    white-space: pre-wrap;
-    text-overflow: initial;
-    line-height: normal;
-  }
-}
-
-@media screen and (max-width: #{$xs}) {
-  .partners-map__list-amount {
-    display: none;
-  }
-}
-
-.partners-map__list-status-ico {
-  margin-right: 5px;
-  flex-basis: 20px;
-  display: flex;
-  align-items: center;
-}
-
-.partners-map__list-status-ico img {
-  width: 18px;
-  height: 18px;
-}
-
-@media screen and (max-width: #{$xs}) {
-  .partners-map__list-status-ico {
-    display: none;
-  }
-}
 
 .partners-map__detail-tip {
   position: absolute;
 }
+
 .partners-map__info {
   display: flex;
   margin-top: 40px;

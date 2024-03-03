@@ -22,22 +22,5 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'DetailTip',
-  emits: ['close'],
-  props: {
-    title: {
-      type: String,
-      required: true,
-    }
-  },
-  methods: {
-    close() {
-      this.$emit('close');
-    },
-  },
-};
-</script>
-
+<script src="./DetailTip.js"></script>
 <style scoped lang="scss" src="./DetailTip.scss"></style>

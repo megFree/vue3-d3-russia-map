@@ -15,19 +15,5 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'ZoomButtons',
-  emits: ['zoomIn', 'zoomOut'],
-  methods: {
-    zoomIn() {
-      this.$emit('zoomIn');
-    },
-    zoomOut() {
-      this.$emit('zoomOut');
-    },
-  },
-};
-</script>
-
+<script src="./ZoomButtons.js"></script>
 <style src="./ZoomButtons.scss" scoped lang="scss"></style>
