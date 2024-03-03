@@ -85,97 +85,9 @@
         </div>
       </DetailTip>
     </div>
-    <div class="partners-map__info container">
-      <div class="partners-map__info-item">
-        <div class="partners-map__info-item-ico">
-          <img
-              src="./assets/images/downtown.png"
-              alt="Иконка локации"
-          />
-        </div>
-        <div class="partners-map__info-item-content">
-          <div class="partners-map__info-item-title">Локация</div>
-          <div v-if="activeRegion" class="partners-map__info-item-value">
-            {{ activeRegion.properties.NAME }}
-          </div>
-          <div v-else class="partners-map__info-item-value">Россия</div>
-        </div>
-      </div>
-      <div class="partners-map__info-item">
-        <div class="partners-map__info-item-ico">
-          <img
-              src="./assets/images/home.svg"
-              alt="Иконка региональных партнеров"
-          />
-        </div>
-        <div class="partners-map__info-item-content">
-          <div class="partners-map__info-item-title">
-            Региональные партнёры
-          </div>
-          <div v-if="activeRegion" class="partners-map__info-item-value">
-            {{ activeRegion.regionalCounter }}
-          </div>
-          <div v-else class="partners-map__info-item-value">
-            {{totalRegionalPartnersCounter}}
-          </div>
-        </div>
-      </div>
-      <div class="partners-map__info-item">
-        <div class="partners-map__info-item-ico">
-          <img
-              src="./assets/images/key.svg"
-              alt="Иконка ключевых партнеров"
-          />
-        </div>
-        <div class="partners-map__info-item-content">
-          <div class="partners-map__info-item-title">Ключевые партнёры</div>
-          <div v-if="activeRegion" class="partners-map__info-item-value">
-            {{ activeRegion.crucialCounter }}
-          </div>
-          <div v-else class="partners-map__info-item-value">
-            {{totalCrucialPartnersCounter}}
-          </div>
-        </div>
-      </div>
-      <div class="partners-map__info-item">
-        <div class="partners-map__info-item-ico">
-          <img
-              src="./assets/images/document.png"
-              alt="Иконка сертифицированных партнеров"
-          />
-        </div>
-        <div class="partners-map__info-item-content">
-          <div class="partners-map__info-item-title">
-            Сертифицированный партнер
-          </div>
-          <div v-if="activeRegion" class="partners-map__info-item-value">
-            {{ activeRegion.certifiedCounter }}
-          </div>
-          <div v-else class="partners-map__info-item-value">
-            {{ totalCertifiedPartnersCounter }}
-          </div>
-        </div>
-      </div>
-      <div class="partners-map__info-item">
-        <div class="partners-map__info-item-ico">
-          <img
-              src="./assets/images/connection.png"
-              alt="Иконка количества внедрений"
-          />
-        </div>
-        <div class="partners-map__info-item-content">
-          <div class="partners-map__info-item-title">
-            Количество внедрений
-          </div>
-          <div v-if="activeRegion" class="partners-map__info-item-value">
-            {{ activeRegion.implementationCounter }}
-          </div>
-          <div v-else class="partners-map__info-item-value">
-            {{ totalImplementationsCounter }}
-          </div>
-        </div>
-      </div>
-    </div>
+
+    <OverallInfo class="partners-map__overall-info" :location="overallInfo" />
+    
   </div>
 </template>
 
@@ -196,6 +108,7 @@ import RegionHoverTip from '@/components/RegionHoverTip/RegionHoverTip.vue';
 import ZoomButtons from '@/components/ZoomButtons/ZoomButtons.vue';
 import DetailTip from '@/components/DetailTip/DetailTip.vue';
 import OrganizationList from '@/components/OrganizationList/OrganizationList.vue';
+import OverallInfo from '@/components/OverallInfo/OverallInfo.vue';
 
 const topoJsonURL =
     "https://gist.githubusercontent.com/megFree/0c3bfaf9d34f8faca9be4d2b6be00aa2/raw/6d5706743886f88f36ed9ea91f6398611eeb8fcd/russiaSimpleTopo.json";
@@ -208,6 +121,7 @@ export default {
     ZoomButtons,
     DetailTip,
     OrganizationList,
+    OverallInfo,
   },
   data() {
     return {
@@ -270,7 +184,6 @@ export default {
           cityBigInnerCircle: selectAll(".js-city-big-inner-mark"),
           citySmallCircle: selectAll(".js-city-small-mark"),
           cityCounter: selectAll(".js-partner-counter"),
-          // partnerList: document.querySelector(".js-partner-list"),
           map: document.querySelector(".js-partners-map"),
         };
       },
@@ -474,6 +387,26 @@ export default {
       this.showRegionTip = false;
     },
   },
+  computed: {
+    overallInfo() {
+      if (!this.activeRegion) {
+        return {
+          name: 'Россия',
+          crucialCounter: this.totalCrucialPartnersCounter,
+          regionalCounter: this.totalRegionalPartnersCounter,
+          certifiedCounter: this.totalCertifiedPartnersCounter,
+          implementationCounter: this.totalImplementationsCounter,
+        };
+      }
+      return {
+        name: this.activeRegion.properties.NAME,
+        crucialCounter: this.activeRegion.crucialCounter,
+        regionalCounter: this.activeRegion.regionalCounter,
+        certifiedCounter: this.activeRegion.certifiedCounter,
+        implementationCounter: this.activeRegion.implementationCounter,
+      };
+    }
+  }
 }
 </script>
 
@@ -581,107 +514,16 @@ export default {
   }
 }
 
-
-
 .partners-map__detail-tip {
   position: absolute;
-}
-
-.partners-map__info {
-  display: flex;
-  margin-top: 40px;
-  justify-content: space-evenly;
-}
-
-@media screen and (max-width: #{$md}) {
-  .partners-map__info {
-    flex-wrap: wrap;
-    justify-content: start;
-    padding: 15px;
-    margin-top: 20px;
-  }
-}
-@media screen and (max-width: #{$xs}) {
-  .partners-map__info {
-    flex-direction: column;
-    margin-top: 0;
-  }
-}
-
-@media screen and (max-width: #{$xs}) {
-  .partners-map__info-item-content {
-    padding-top: 8px;
-  }
-}
-
-.partners-map__info-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-width: 20%;
-  margin-bottom: 40px;
-  flex-shrink: 1;
-}
-
-@media screen and (max-width: #{$md}) {
-  .partners-map__info-item {
-    width: 50%;
-    flex-direction: row;
-  }
-}
-@media screen and (max-width: #{$xs}) {
-  .partners-map__info-item {
-    min-width: 100%;
-    align-items: start;
-  }
-}
-
-.partners-map__info-item-title {
-  text-align: center;
-  font-size: .9rem;
-  color: #929aa3;
-}
-
-@media screen and (max-width: #{$md}) {
-  .partners-map__info-item-title {
-    text-align: left;
-  }
-}
-
-.partners-map__info-item-ico {
-  margin-bottom: 20px;
-  max-width: 48px;
-  max-height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  img {
-    width: 100%;
-    height: 100%;
-  }
-}
-
-@media screen and (max-width: #{$md}) {
-  .partners-map__info-item-ico {
-    margin-bottom: 0;
-    margin-right: 15px;
-  }
-}
-
-.partners-map__info-item-value {
-  font-weight: 600;
-  text-align: center;
-}
-
-@media screen and (max-width: #{$md}) {
-  .partners-map__info-item-value {
-    text-align: left;
-  }
 }
 
 .partners-map__not-found-warning {
   padding: 12px;
   color: #f2291f;
+}
+
+.partners-map__overall-info {
+  margin-top: 40px;
 }
 </style>
