@@ -32,7 +32,7 @@ export default {
       regionClasses(region) {
         const regionClasses = {
           "region-map__region--not-stroke": region.properties.notStroke,
-          "no-partners": !region.hasPartners,
+          "no-companies": !region.hasCompanies,
         };
         if (
           this.activeRegion &&
@@ -51,8 +51,8 @@ export default {
           cityBigOuterCircle: selectAll(".js-city-bit-outer-mark"),
           cityBigInnerCircle: selectAll(".js-city-big-inner-mark"),
           citySmallCircle: selectAll(".js-city-small-mark"),
-          cityCounter: selectAll(".js-partner-counter"),
-          map: document.querySelector(".js-partners-map"),
+          cityCounter: selectAll(".js-company-counter"),
+          map: document.querySelector(".js-region-map"),
         };
       },
 
@@ -102,7 +102,7 @@ export default {
       this.showRegionTip = false;
 
       const [[x0, y0], [x1, y1]] = this.path.bounds(geoObject);
-      if (geoObject.hasPartners) {
+      if (geoObject.hasCompanies) {
         this.selections()
           .svgContainer.transition()
           .duration(750)
@@ -191,12 +191,12 @@ export default {
   },
 
   computed: {
-    partnerCities() {
-      const partnerCities = [];
+    companyCities() {
+      const cities = [];
       if (this.geoRegions?.length) {
         this.geoRegions.forEach((region) => {
-          if (region.hasPartners) {
-            region.partnerData.cities.forEach((city) => {
+          if (region.hasCompanies) {
+            region.companyData.cities.forEach((city) => {
               const cityCopy = {
                 ...city,
               };
@@ -205,13 +205,13 @@ export default {
                 cityCopy.coord[0],
               ])})`;
               cityCopy.regionISO = region.properties.ISO;
-              partnerCities.push(cityCopy);
+              cities.push(cityCopy);
             });
           }
         });
       }
 
-      return partnerCities;
+      return cities;
     },
   },
 };

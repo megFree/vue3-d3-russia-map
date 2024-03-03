@@ -1,40 +1,38 @@
 <template>
-  <div id="map" class="partners-map" v-cloak>
-    <div class="js-partners-map">
-      <RegionMap
-        :geo-regions="geoRegions"
-        @region-selected="onRegionSelected"
-        @city-selected="onCitySelected"
-        @zoom="onMapZoom"
+  <div id="map" class="map" v-cloak>
+    <RegionMap
+      :geo-regions="geoRegions"
+      @region-selected="onRegionSelected"
+      @city-selected="onCitySelected"
+      @zoom="onMapZoom"
+    />
+
+    <OverallInfo class="map__overall-info" :location="overallInfo" />
+
+    <DetailTip
+      v-if="showCompanyList"
+      class="map__detail-tip"
+      :style="companyListStyles"
+      :title="activeCity.city"
+      @close="onCloseCompanyList"
+    >
+      <OrganizationList
+        class="map__org-list"
+        :items="activeCity.partners"
       />
+    </DetailTip>
 
-      <DetailTip
-        v-if="showPartnerList"
-        class="partners-map__detail-tip"
-        :style="partnerListStyles"
-        :title="activeCity.city"
-        @close="onClosePartnerList"
-      >
-        <OrganizationList
-          class="partners-map__org-list"
-          :items="activeCity.partners"
-        />
-      </DetailTip>
-
-      <DetailTip
-        v-if="showNoPartnersTip"
-        class="partners-map__detail-tip"
-        :style="noPartnersTipStyles"
-        :title="activeRegion.properties.NAME"
-        @close="onCloseNoPartnerTip"
-      >
-        <div class="partners-map__not-found-warning">
-          В данном регионе партнёров не обнаружено!
-        </div>
-      </DetailTip>
-    </div>
-
-    <OverallInfo class="partners-map__overall-info" :location="overallInfo" />
+    <DetailTip
+      v-if="showNoCompaniesTip"
+      class="map__detail-tip"
+      :style="noCompaniesTipStyles"
+      :title="activeRegion.properties.NAME"
+      @close="onCloseNoCompaniesTip"
+    >
+      <div class="map__not-found-warning">
+        В данном регионе компаний не обнаружено!
+      </div>
+    </DetailTip>
   </div>
 </template>
 
@@ -49,7 +47,7 @@ import RegionMap from "@/components/RegionMap/RegionMap.vue";
 
 const topoJsonURL =
   "https://gist.githubusercontent.com/megFree/0c3bfaf9d34f8faca9be4d2b6be00aa2/raw/6d5706743886f88f36ed9ea91f6398611eeb8fcd/russiaSimpleTopo.json";
-const partnersJsonURL =
+const companiesJsonURL =
   "https://gist.githubusercontent.com/megFree/265c96083cf012718f8c746a8b3c718b/raw/d8e899d0b06e650d5c4cf57276414446ca58b725/demodata.json";
 
 export default {
@@ -63,18 +61,18 @@ export default {
     return {
       geoRegions: null,
       activeRegion: null,
-      showPartnerList: false,
-      showNoPartnersTip: false,
+      showCompanyList: false,
+      showNoCompaniesTip: false,
       activeCity: null,
-      totalCrucialPartnersCounter: 0,
-      totalRegionalPartnersCounter: 0,
-      totalCertifiedPartnersCounter: 0,
+      totalCrucialCompaniesCounter: 0,
+      totalRegionalCompaniesCounter: 0,
+      totalCertifiedCompaniesCounter: 0,
       totalImplementationsCounter: 0,
-      partnerListStyles: {
+      companyListStyles: {
         left: "",
         top: "",
       },
-      noPartnersTipStyles: {
+      noCompaniesTipStyles: {
         left: "",
         top: "",
       },
@@ -89,29 +87,29 @@ export default {
     // Иначе она рассекается по нулевому меридиану, картографам привет)
     regionData[21].properties.notStroke = true;
 
-    const partnerRegionalData = await json(partnersJsonURL);
+    const companyRegionalData = await json(companiesJsonURL);
     regionData.forEach((region) => {
       region.crucialCounter = 0;
       region.certifiedCounter = 0;
       region.regionalCounter = 0;
       region.implementationCounter = 0;
 
-      partnerRegionalData.forEach((regionalData) => {
+      companyRegionalData.forEach((regionalData) => {
         if (region.properties.ISO === regionalData.iso) {
-          region.partnerData = regionalData;
+          region.companyData = regionalData;
 
           regionalData.cities.forEach((city) => {
-            city.partners.forEach((partner) => {
-              if (partner.crucial) {
+            city.partners.forEach((company) => {
+              if (company.crucial) {
                 region.crucialCounter++;
               }
-              if (partner.certified) {
+              if (company.certified) {
                 region.certifiedCounter++;
               }
-              if (partner.regional) {
+              if (company.regional) {
                 region.regionalCounter++;
               }
-              region.implementationCounter += partner.count;
+              region.implementationCounter += company.count;
             });
           });
         }
@@ -119,53 +117,53 @@ export default {
     });
 
     regionData.forEach((region) => {
-      if (region.partnerData) {
-        return (region.hasPartners = true);
+      if (region.companyData) {
+        return (region.hasCompanies = true);
       } else {
-        return (region.hasPartners = false);
+        return (region.hasCompanies = false);
       }
     });
 
     this.geoRegions = regionData;
 
     this.geoRegions.forEach((region) => {
-      this.totalCertifiedPartnersCounter += region.certifiedCounter;
-      this.totalCrucialPartnersCounter += region.crucialCounter;
+      this.totalCertifiedCompaniesCounter += region.certifiedCounter;
+      this.totalCrucialCompaniesCounter += region.crucialCounter;
       this.totalImplementationsCounter += region.implementationCounter;
-      this.totalRegionalPartnersCounter += region.regionalCounter;
+      this.totalRegionalCompaniesCounter += region.regionalCounter;
     });
   },
   methods: {
-    onClosePartnerList() {
-      this.showPartnerList = false;
+    onCloseCompanyList() {
+      this.showCompanyList = false;
     },
 
-    onCloseNoPartnerTip() {
-      this.showNoPartnersTip = false;
+    onCloseNoCompaniesTip() {
+      this.showNoCompaniesTip = false;
     },
 
     onRegionSelected(event, region) {
       this.activeRegion = region;
-      this.showNoPartnersTip = false;
-      this.showPartnerList = false;
+      this.showNoCompaniesTip = false;
+      this.showCompanyList = false;
 
-      if (!this.activeRegion.hasPartners) {
-        this.showNoPartnersTip = true;
-        this.noPartnersTipStyles.top = event.pageY + "px";
-        this.noPartnersTipStyles.left = event.pageX + "px";
+      if (!this.activeRegion.hasCompanies) {
+        this.showNoCompaniesTip = true;
+        this.noCompaniesTipStyles.top = event.pageY + "px";
+        this.noCompaniesTipStyles.left = event.pageX + "px";
       }
     },
 
     onCitySelected(event, city) {
       this.activeCity = city;
-      this.partnerListStyles.left = event.pageX + "px";
-      this.partnerListStyles.top = event.pageY + "px";
-      this.showPartnerList = true;
+      this.companyListStyles.left = event.pageX + "px";
+      this.companyListStyles.top = event.pageY + "px";
+      this.showCompanyList = true;
     },
 
     onMapZoom() {
-      this.showNoPartnersTip = false;
-      this.showPartnerList = false;
+      this.showNoCompaniesTip = false;
+      this.showCompanyList = false;
     },
   },
   computed: {
@@ -173,9 +171,9 @@ export default {
       if (!this.activeRegion) {
         return {
           name: "Россия",
-          crucialCounter: this.totalCrucialPartnersCounter,
-          regionalCounter: this.totalRegionalPartnersCounter,
-          certifiedCounter: this.totalCertifiedPartnersCounter,
+          crucialCounter: this.totalCrucialCompaniesCounter,
+          regionalCounter: this.totalRegionalCompaniesCounter,
+          certifiedCounter: this.totalCertifiedCompaniesCounter,
           implementationCounter: this.totalImplementationsCounter,
         };
       }
@@ -192,16 +190,16 @@ export default {
 </script>
 
 <style lang="scss">
-.partners-map__detail-tip {
+.map__detail-tip {
   position: absolute;
 }
 
-.partners-map__not-found-warning {
+.map__not-found-warning {
   padding: 12px;
   color: #f2291f;
 }
 
-.partners-map__overall-info {
+.map__overall-info {
   margin-top: 40px;
 }
 </style>

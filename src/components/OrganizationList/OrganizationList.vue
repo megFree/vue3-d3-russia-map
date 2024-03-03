@@ -14,19 +14,19 @@
     <div class="organization-list__items-container">
       <a
         class="organization-list__item"
-        v-for="partner in items"
-        :key="partner.partner"
+        v-for="company in items"
+        :key="company.partner"
         href="#"
       >
         <div class="organization-list__status">
           <div class="organization-list__status-ico">
             <img
-              v-if="partner.crucial"
+              v-if="company.crucial"
               src="@/assets/images/key.svg"
               alt="Иконка ключевого партнера"
             />
             <img
-              v-else-if="partner.certified"
+              v-else-if="company.certified"
               src="@/assets/images/document.png"
               alt="Иконка сертифицированного партнера"
             />
@@ -36,11 +36,11 @@
               alt="Иконка регионального партнера"
             />
           </div>
-          <div v-if="partner.crucial" class="organization-list__status-text">
+          <div v-if="company.crucial" class="organization-list__status-text">
             Ключевой
           </div>
           <div
-            v-else-if="partner.certified"
+            v-else-if="company.certified"
             class="organization-list__status-text"
           >
             Сертифицированный
@@ -48,9 +48,9 @@
           <div v-else class="organization-list__status-text">Региональный</div>
         </div>
         <div class="organization-list__organization">
-          {{ partner.partner }}
+          {{ company.partner }}
         </div>
-        <div class="organization-list__amount">{{ partner.count }}</div>
+        <div class="organization-list__amount">{{ company.count }}</div>
       </a>
     </div>
   </div>
